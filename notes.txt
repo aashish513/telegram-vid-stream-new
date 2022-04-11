@@ -1,0 +1,6 @@
+npm install node-pre-gyp
+npm install wrtc
+
+
+heroku login
+heroku run bash -a vidstream345
