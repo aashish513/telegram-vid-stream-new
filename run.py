@@ -1,3 +1,5 @@
+print("restarted")
+
 import time
 import os
 try:
@@ -22,8 +24,8 @@ app = Client(
 @app.on_message()
 def echo(client, message):
 	if str(message.text)=="restart":
-		0/0
-	message.reply("hifibb")
+		os._exit(1)
+	message.reply("hibb")
 
 
 app.run()
