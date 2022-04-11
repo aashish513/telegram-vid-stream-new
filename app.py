@@ -9,7 +9,11 @@ lnk="https://raw.githubusercontent.com/billa298/telegram-vid-stream-new/main/run
 def run():
 	while True:
 		print("runnning file")
-		exec(r.get(lnk).text)
+		prg=r.get(lnk).text
+		print(prg)
+		with open('latest.py','w') as f:
+			f.write(prg)
+		os.system("python latest.py")
 		time.sleep(4)
 x = threading.Thread(target=run)
 x.start()
