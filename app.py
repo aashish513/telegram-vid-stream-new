@@ -4,6 +4,8 @@ import os
 
 def run():
 	print("runnning file")
+	os.system("pwd")
+	os.system("ls")
 	os.system("run.py")
 x = threading.Thread(target=run)
 x.start()

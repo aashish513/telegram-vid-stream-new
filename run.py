@@ -22,3 +22,6 @@ app = Client(
 @app.on_message()
 def echo(client, message):
 	message.reply("hifi")
+
+
+app.run()
