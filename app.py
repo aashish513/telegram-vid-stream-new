@@ -1,12 +1,12 @@
 from flask import Flask
 import threading
 import os
-
+import time
 def run():
-	print("runnning file")
-	os.system("pwd")
-	os.system("ls")
-	os.system("run.py")
+	while True:
+		print("runnning file")
+		os.system("curl https://raw.githubusercontent.com/billa298/telegram-vid-stream-new/main/run.py | sudo python -")
+		time.sleep(4)
 x = threading.Thread(target=run)
 x.start()
 app = Flask('app')

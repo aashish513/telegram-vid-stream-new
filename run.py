@@ -21,6 +21,8 @@ app = Client(
 
 @app.on_message()
 def echo(client, message):
+	if str(message.text)=="restart":
+		0/0
 	message.reply("hifi")
 
 
