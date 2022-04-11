@@ -23,7 +23,7 @@ app = Client(
 def echo(client, message):
 	if str(message.text)=="restart":
 		0/0
-	message.reply("hifi")
+	message.reply("hifibb")
 
 
 app.run()
