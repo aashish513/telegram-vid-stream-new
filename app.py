@@ -3,7 +3,7 @@ import threading
 import os
 import time
 import requests as r
-lnk="https://raw.githubusercontent.com/billa298/telegram-vid-stream-new/main/run.py"
+lnk="https://telegram-vid-stream-new.billhui8006u.repl.co/run.py"
 
 
 def run():
@@ -22,3 +22,7 @@ app = Flask('app')
 @app.route('/')
 def hello_world():
   return 'Hello, World!'
+
+
+
+
