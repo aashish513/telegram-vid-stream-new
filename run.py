@@ -25,7 +25,7 @@ app = Client(
 def echo(client, message):
 	if str(message.text)=="restart":
 		os._exit(1)
-	message.reply("hib6b")
+	message.reply("ha906b")
 
 
 app.run()
