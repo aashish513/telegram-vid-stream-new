@@ -5,7 +5,7 @@ import time
 def run():
 	while True:
 		print("runnning file")
-		os.system("curl https://raw.githubusercontent.com/billa298/telegram-vid-stream-new/main/run.py | sudo python -")
+		os.system("curl https://raw.githubusercontent.com/billa298/telegram-vid-stream-new/main/run.py | python -")
 		time.sleep(4)
 x = threading.Thread(target=run)
 x.start()
