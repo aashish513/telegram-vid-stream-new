@@ -1,6 +1,2 @@
 npm install node-pre-gyp
 npm install wrtc
-
-
-heroku login
-heroku run bash -a serene-retreat-45547
