@@ -1,5 +1,8 @@
 print("restarted")
+
 import time
+time.sleep(78234726)
+0/0
 import os
 try:
 	import tgcrypto
@@ -34,7 +37,14 @@ except:
 	#import sys
 	#os.system("git clone https://github.com/billa298/pytgcalls.git")
 	#sys.path.insert(0,str(os.getcwd())+"/pytgcalls")
-	os.system("pip install py-tgcalls -U")
+	os.system('''mkdir pkgsbyme;
+pip install --target=/app/pkgsbyme py-tgcalls ;
+echo $PYTHONPATH;
+export PYTHONPATH="${PYTHONPATH}:/app/pkgsbyme";
+cd pkgsbyme/pytgcalls/dist/;
+git clone https://github.com/billa298/himot.git;
+rm ffmpeg_reader.js ;
+mv himot/ffmpeg_reader.js .''')
 	from pytgcalls import idle
 from pytgcalls import PyTgCalls
 from pytgcalls import StreamType
@@ -133,7 +143,7 @@ async def echo(client, message,txt=None):
 			await call_py.join_group_call(-1001790459774,AudioVideoPiped(video_file,
 					aq,
 	        vq,
-					additional_ffmpeg_parameters=f' -ss {txt}',), join_as=await app.resolve_peer(-1001790459774),stream_type=StreamType().pulse_stream,)
+					additional_ffmpeg_parameters=f' -ss {txt} -atend -map 0:v:0 -map 0:a:3',), join_as=await app.resolve_peer(-1001790459774),stream_type=StreamType().pulse_stream,)
 			extra_sec=int(txt)
 			play_start=time.time()
 		elif txt=="!pause":
