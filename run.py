@@ -1,8 +1,7 @@
 print("restarted")
 
 import time
-time.sleep(78234726)
-0/0
+
 import os
 try:
 	import tgcrypto
