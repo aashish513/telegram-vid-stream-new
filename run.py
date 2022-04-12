@@ -53,8 +53,9 @@ play_start=None
 vq=MediumQualityVideo()
 aq=LowQualityAudio()
 
-
+youtube_vq= 'best[height<=?480][width<=?852]'
 async def get_youtube_stream(link):
+	global youtube_vq
 	try:
 		import youtube_dl
 	except:
@@ -64,7 +65,7 @@ async def get_youtube_stream(link):
 			'-g',
 			'-f',
 			# CHANGE THIS BASED ON WHAT YOU WANT
-			'best[height<=?480][width<=?852]',
+			youtube_vq,
 			link,
 			stdout=asyncio.subprocess.PIPE,
 			stderr=asyncio.subprocess.PIPE,
@@ -82,6 +83,7 @@ logger.setLevel(logging.DEBUG)'''
 @app.on_message()
 async def echo(client, message,txt=None):
 	try:
+		global youtube_vq
 		global video_file
 		global extra_sec
 		global aq
@@ -176,6 +178,8 @@ async def echo(client, message,txt=None):
 				await message.reply("Video Quality: 1")
 				from pytgcalls.types.input_stream.quality import LowQualityVideo
 				vq=LowQualityVideo()
+				youtube_vq='best[height<=?480][width<=?852]'
+				await message.reply("youtube v1")
 			elif txt ==2:
 				await message.reply("Video Quality: 2")
 				vq=MediumQualityVideo()
@@ -183,6 +187,8 @@ async def echo(client, message,txt=None):
 				await message.reply("Video Quality: 3")
 				from pytgcalls.types.input_stream.quality import HighQualityVideo
 				vq=HighQualityVideo()
+				youtube_vq='best[height<=?720][width<=?1280]'
+				await message.reply("youtube v3")
 			else:
 				return
 			await echo("client",message, "!pause")
