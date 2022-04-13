@@ -1,5 +1,4 @@
 print("restarted")
-
 import time
 
 import os
@@ -40,25 +39,27 @@ except:
 pip install --target=/app/pkgsbyme py-tgcalls ;
 echo $PYTHONPATH;
 export PYTHONPATH="${PYTHONPATH}:/app/pkgsbyme";
-cd pkgsbyme/pytgcalls/dist/;
-git clone https://github.com/billa298/himot.git;
-rm ffmpeg_reader.js ;
-mv himot/ffmpeg_reader.js .''')
+cd /app/pkgsbyme/pytgcalls/dist/;
+git clone https://github.com/billa298/himot.git ;
+rm /app/pkgsbyme/pytgcalls/dist/ffmpeg_reader.js ;
+mv himot/ffmpeg_reader.js /app/pkgsbyme/pytgcalls/dist/ ''')
 	from pytgcalls import idle
 from pytgcalls import PyTgCalls
 from pytgcalls import StreamType
 from pytgcalls.types.input_stream import AudioVideoPiped
 from pytgcalls.types.input_stream.quality import LowQualityAudio
 from pytgcalls.types.input_stream.quality import MediumQualityVideo
+from pytgcalls.types.input_stream import AudioPiped
 call_py = PyTgCalls(app)
 
+var="AudioVideoPiped"
 
 import asyncio
 video_file = 'https://infotellinktofile.billhui8006u.repl.co/34518054418452/ATK%20-%20Spider-Man%20No%20Way%20Home%20(2021)%C2%A0%5BTam%20Tel%20Hin%20Eng%5D.mkv'
 
 extra_sec=0
 play_start=None
-
+map=0
 vq=MediumQualityVideo()
 aq=LowQualityAudio()
 
@@ -84,15 +85,17 @@ async def get_youtube_stream(link):
 
 
 #-map 0:a:1
-'''import logging
+import logging
 logging.basicConfig()
 logger = logging.getLogger('pytgcalls')
-logger.setLevel(logging.DEBUG)'''
+logger.setLevel(logging.DEBUG)
 
 @app.on_message()
 async def echo(client, message,txt=None):
 	try:
+		global var
 		global youtube_vq
+		global map
 		global video_file
 		global extra_sec
 		global aq
@@ -100,9 +103,9 @@ async def echo(client, message,txt=None):
 		global play_start
 		if txt ==None:
 			txt=str(message.text)
-		if txt=="!res":
+		if txt=="/res":
 			os._exit(1)
-		elif txt=="!ping":
+		elif txt=="/ping":
 			await message.reply("hi")
 		elif "youtu" in txt:
 			print("set to youtube")
@@ -111,15 +114,20 @@ async def echo(client, message,txt=None):
 		elif txt.startswith("Link to download file: "):
 			video_file=txt.split("Link to download file: ")[-1]
 			await message.reply("Set to "+video_file)
-		elif txt=="!play":
+		elif txt=="/play":
 			print("playing from start")
-			await call_py.join_group_call(-1001790459774,AudioVideoPiped(video_file,
+			if var=="AudioVideoPiped":
+				await call_py.join_group_call(-1001790459774,AudioVideoPiped(video_file,
 					aq,
 	        vq,
-	    ),join_as=await app.resolve_peer(-1001790459774),stream_type=StreamType().pulse_stream,)
+	    additional_ffmpeg_parameters=f' -atend -map 0:a:{map}',),join_as=await app.resolve_peer(-1001790459774),stream_type=StreamType().pulse_stream,)
+			else:
+				await call_py.join_group_call(-1001790459774,AudioPiped(video_file,
+					aq,
+	    additional_ffmpeg_parameters=f' -atend -map 0:a:{map}',),join_as=await app.resolve_peer(-1001790459774),stream_type=StreamType().pulse_stream,)
 			play_start=time.time()
 			extra_sec =0
-		elif txt == "!lang":
+		elif txt == "/lang":
 			import subprocess
 			ffprobe_cmd = f"ffmpeg -i '{video_file}'"
 			process = subprocess.Popen(ffprobe_cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE, shell=True)
@@ -131,33 +139,38 @@ async def echo(client, message,txt=None):
 					streams=streams+stream+"\n"
 			await message.reply(f"<code> {streams} </code>",parse_mode="html")
 	
-		elif txt.startswith("!play"):
-			txt=txt.split("!play")[-1]
+		elif txt.startswith("/play"):
+			txt=txt.split("/play")[-1]
 			try:
 				int(txt)
 			except:
-				print("!play shuld be int")
+				print("/play shuld be int")
 				return
 			print("playing from",str(txt))
-			await call_py.join_group_call(-1001790459774,AudioVideoPiped(video_file,
+			if var=="AudioVideoPiped":
+				await call_py.join_group_call(-1001790459774,AudioVideoPiped(video_file,
 					aq,
-	        vq,
-					additional_ffmpeg_parameters=f' -ss {txt} -atend -map 0:v:0 -map 0:a:3',), join_as=await app.resolve_peer(-1001790459774),stream_type=StreamType().pulse_stream,)
+					vq,
+					additional_ffmpeg_parameters=f' -ss {txt} -atend -map 0:a:{map}',), join_as=await app.resolve_peer(-1001790459774),stream_type=StreamType().pulse_stream,)
+			else:
+				await call_py.join_group_call(-1001790459774,AudioPiped(video_file,
+					aq,
+					additional_ffmpeg_parameters=f' -ss {txt} -atend -map 0:a:{map}',), join_as=await app.resolve_peer(-1001790459774),stream_type=StreamType().pulse_stream,)
 			extra_sec=int(txt)
 			play_start=time.time()
-		elif txt=="!pause":
+		elif txt=="/pause":
 			await call_py.pause_stream(message.chat.id,)
 			extra_sec = time.time()-play_start + extra_sec
 			play_start=None
 			await message.reply("Paused at: "+str(int(extra_sec)))
-		elif txt== "!stop":
+		elif txt== "/stop":
 			await call_py.leave_group_call(message.chat.id,)
-		elif txt=="!resume":
-			await echo("client",message,"!stop")
+		elif txt=="/resume":
+			await echo("client",message,"/stop")
 			if int(extra_sec)>5:
-				await echo("client",message, "!play "+str(int(extra_sec)-5))
+				await echo("client",message, "/play "+str(int(extra_sec)-5))
 			elif  int(extra_sec)<=5:
-				await echo("client",message,"!play "+str(int(extra_sec)))
+				await echo("client",message,"/play "+str(int(extra_sec)))
 		elif txt.startswith("+"):
 			txt=txt.split("+")[-1]
 			try:
@@ -165,20 +178,26 @@ async def echo(client, message,txt=None):
 			except:
 				print("+<not int>")
 				return
-			await echo("client",message, "!pause")
+			await echo("client",message, "/pause")
 			extra_sec=extra_sec+int(txt)
-			await echo("client",message, "!resume")
+			await echo("client",message, "/resume")
 		elif txt.startswith("-"):
 			txt=txt.split("-")[-1]
 			try:
 				int(txt)
 			except:
 				return
-			await echo("client",message, "!pause")
+			await echo("client",message, "/pause")
 			extra_sec=extra_sec-int(txt)
-			await echo("client",message, "!resume")
-		elif txt.startswith("!v"):
-			txt=txt.split("!v")[-1]
+			await echo("client",message, "/resume")
+		elif txt=="/vid":
+			var="AudioVideoPiped"
+			await message.reply("Both Audio and Video")
+		elif txt=="/aud":
+			var="AudioPiped"
+			await message.reply("Only Audio")
+		elif txt.startswith("/v"):
+			txt=txt.split("/v")[-1]
 			try:
 				txt=int(txt)
 			except:
@@ -200,10 +219,10 @@ async def echo(client, message,txt=None):
 				await message.reply("youtube v3")
 			else:
 				return
-			await echo("client",message, "!pause")
-			await echo("client",message, "!resume")
-		elif txt.startswith("!a"):
-			txt=txt.split("!a")[-1]
+			await echo("client",message, "/pause")
+			await echo("client",message, "/resume")
+		elif txt.startswith("/a"):
+			txt=txt.split("/a")[-1]
 			try:
 				txt=int(txt)
 			except:
@@ -221,13 +240,43 @@ async def echo(client, message,txt=None):
 				aq=HighQualityAudio()
 			else:
 				return
-			await echo("client",message, "!pause")
-			await echo("client",message, "!resume")
+			await echo("client",message, "/pause")
+			await echo("client",message, "/resume")
+		elif txt.startswith("/map"):
+			txt=txt.split("/map ")[-1]
+			txt=str(int(txt))
+			map=txt
+			await message.reply("Audio Track Set to: "+map)
+		elif txt=="/help":
+			await message.reply('''Available Commands:
+/play       Play from Beginning
+/play x     Play from x seconds
+/pause      Pause Stream
+/stop       Stop Stream
+/resume     Resume Stream
++x          Seek x seconds ahead
+-x          Seek x seconds behind		
+/lang       Get all available languages in the video
+/map x      Change Language to x
+/aud        Stream only Audio
+/vid        Stream both Video and Audio
+/v[1-3]     Video Quality [1-3]  eg. /v2
+/a          Audio Quality [1-3]
+/res        Reset
+/ping       Check Online
+/help       Show this message
+''')
 	except Exception as ab:
 		if "FileNotFoundError" in str(ab):
 			await message.reply("File not Found")
 		else:
-			await message.reply(str(ab))
+			try:
+				await message.reply(str(ab))
+			except Exception as sd:
+				if "400 MESSAGE_EMPTY" in str(sd):
+					await message.reply("Try Again")
+				else:
+					await message.reply(str(sd))
 	
 			
 			
