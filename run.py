@@ -6,7 +6,7 @@ try:
 	import tgcrypto
 except:
 	os.system("pip install tgcrypto")
-
+import traceback
 try:
 	from pyrogram import Client
 except:
@@ -50,6 +50,7 @@ from pytgcalls.types.input_stream import AudioVideoPiped
 from pytgcalls.types.input_stream.quality import LowQualityAudio
 from pytgcalls.types.input_stream.quality import MediumQualityVideo
 from pytgcalls.types.input_stream import AudioPiped
+from pytgcalls.types import Update
 call_py = PyTgCalls(app)
 
 var="AudioVideoPiped"
@@ -85,15 +86,16 @@ async def get_youtube_stream(link):
 
 
 #-map 0:a:1
-import logging
+'''import logging
 logging.basicConfig()
 logger = logging.getLogger('pytgcalls')
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.DEBUG)'''
 
 @app.on_message()
 async def echo(client, message,txt=None):
 	try:
 		global var
+		global join_as
 		global youtube_vq
 		global map
 		global video_file
@@ -114,17 +116,25 @@ async def echo(client, message,txt=None):
 		elif txt.startswith("Link to download file: "):
 			video_file=txt.split("Link to download file: ")[-1]
 			await message.reply("Set to "+video_file)
+		elif txt=="/r":
+			await call_py.resume_stream(-1001790459774,)
+			play_start=time.time()
+		elif txt.startswith("/vol "):
+			vol=txt.split("/vol ")[-1]
+			await call_py.change_volume_call(-1001790459774,int(vol),)
+			await message.reply(f"volume: {vol}%")
+
 		elif txt=="/play":
 			print("playing from start")
 			if var=="AudioVideoPiped":
 				await call_py.join_group_call(-1001790459774,AudioVideoPiped(video_file,
 					aq,
 	        vq,
-	    additional_ffmpeg_parameters=f' -atend -map 0:a:{map}',),join_as=await app.resolve_peer(-1001790459774),stream_type=StreamType().pulse_stream,)
+	    additional_ffmpeg_parameters=f' -atend -map 0:a:{map}',),join_as=join_as,stream_type=StreamType().pulse_stream,)
 			else:
 				await call_py.join_group_call(-1001790459774,AudioPiped(video_file,
 					aq,
-	    additional_ffmpeg_parameters=f' -atend -map 0:a:{map}',),join_as=await app.resolve_peer(-1001790459774),stream_type=StreamType().pulse_stream,)
+	    additional_ffmpeg_parameters=f' -atend -map 0:a:{map}',),join_as=join_as,stream_type=StreamType().pulse_stream,)
 			play_start=time.time()
 			extra_sec =0
 		elif txt == "/lang":
@@ -151,20 +161,20 @@ async def echo(client, message,txt=None):
 				await call_py.join_group_call(-1001790459774,AudioVideoPiped(video_file,
 					aq,
 					vq,
-					additional_ffmpeg_parameters=f' -ss {txt} -atend -map 0:a:{map}',), join_as=await app.resolve_peer(-1001790459774),stream_type=StreamType().pulse_stream,)
+					additional_ffmpeg_parameters=f' -ss {txt} -atend -map 0:a:{map}',), join_as=join_as,stream_type=StreamType().pulse_stream,)
 			else:
 				await call_py.join_group_call(-1001790459774,AudioPiped(video_file,
 					aq,
-					additional_ffmpeg_parameters=f' -ss {txt} -atend -map 0:a:{map}',), join_as=await app.resolve_peer(-1001790459774),stream_type=StreamType().pulse_stream,)
+					additional_ffmpeg_parameters=f' -ss {txt} -atend -map 0:a:{map}',), join_as=join_as,stream_type=StreamType().pulse_stream,)
 			extra_sec=int(txt)
 			play_start=time.time()
 		elif txt=="/pause":
-			await call_py.pause_stream(message.chat.id,)
+			await call_py.pause_stream(-1001790459774,)
 			extra_sec = time.time()-play_start + extra_sec
 			play_start=None
 			await message.reply("Paused at: "+str(int(extra_sec)))
 		elif txt== "/stop":
-			await call_py.leave_group_call(message.chat.id,)
+			await call_py.leave_group_call(-1001790459774,)
 		elif txt=="/resume":
 			await echo("client",message,"/stop")
 			if int(extra_sec)>5:
@@ -253,7 +263,7 @@ async def echo(client, message,txt=None):
 /play x     Play from x seconds
 /pause      Pause Stream
 /stop       Stop Stream
-/resume     Resume Stream
+/r          Resume Stream						
 +x          Seek x seconds ahead
 -x          Seek x seconds behind		
 /lang       Get all available languages in the video
@@ -262,11 +272,15 @@ async def echo(client, message,txt=None):
 /vid        Stream both Video and Audio
 /v[1-3]     Video Quality [1-3]  eg. /v2
 /a          Audio Quality [1-3]
+/vol x      Set the volume to x(1-200).(Can also be done manually by individual participants)
 /res        Reset
 /ping       Check Online
 /help       Show this message
+
+Double tap mic icon to pause/resume in group call
 ''')
 	except Exception as ab:
+		print(traceback.format_exc())
 		if "FileNotFoundError" in str(ab):
 			await message.reply("File not Found")
 		else:
@@ -278,15 +292,31 @@ async def echo(client, message,txt=None):
 				else:
 					await message.reply(str(sd))
 	
-			
-			
+
+users={}
+
+@call_py.on_participants_change()
+async def handler(client: PyTgCalls, update: Update):
+	global users
+	global play_start
+	if "UpdatedGroupCallParticipant" in str(update):
+		try:
+			cond=users[update.participant.user_id][0] != update.participant.muted and time.time()-users[update.participant.user_id][1]<0.3
+		except:
+			cond=False
+		if cond:
+			try:
+				status=call_py.get_active_call(-1001790459774,).status
+				if status=="paused":
+					await echo("client","msg","/r")
+				else:
+					await echo("client","msg","/pause")
+			except Exception as e:
+				pass
+		users[update.participant.user_id] = [update.participant.muted,time.time()]
 		
 
-
-
-
 call_py.start()
-
-
+join_as=app.resolve_peer(-1001790459774)
 
 idle()
