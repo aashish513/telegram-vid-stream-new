@@ -146,7 +146,8 @@ async def echo(client, message,txt=None):
 						try:
 							await asyncio.wait_for(join_and_play(), timeout=20)
 						except Exception as ef:
-							message.reply("err here "+str(ef))
+							print(traceback.format_exc())
+							await message.reply("err here "+str(ef))
 						break
 					except:
 						inh=inh+1
