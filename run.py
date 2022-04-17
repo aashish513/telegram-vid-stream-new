@@ -82,9 +82,7 @@ async def get_youtube_stream(link):
 			stderr=asyncio.subprocess.PIPE,
 	)
 	stdout, stderr = await proc.communicate()
-	link=stdout.decode().split('\n')[0]
-	os.system(f"wget -O video.mp4 {link}")
-	return "video.mp4"
+	return stdout.decode().split('\n')[0]
 
 ffmpeg_vol_flag=""
 
