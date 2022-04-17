@@ -161,7 +161,6 @@ async def echo(client, message,txt=None):
 							raise Exception("Try again(2)")
 			play_start=time.time()
 			extra_sec =0
-			await idle()
 		elif txt == "/lang":
 			import subprocess
 			ffprobe_cmd = f"ffmpeg -i '{video_file}'"
@@ -193,7 +192,6 @@ async def echo(client, message,txt=None):
 					additional_ffmpeg_parameters=f' -ss {txt} -atend -map 0:a:{map} {ffmpeg_vol_flag} ',), join_as=join_as,stream_type=StreamType().pulse_stream,)
 			extra_sec=int(txt)
 			play_start=time.time()
-			await idle()
 		elif txt=="/pause":
 			await call_py.pause_stream(-1001790459774,)
 			extra_sec = time.time()-play_start + extra_sec
@@ -341,9 +339,14 @@ async def handler(client: PyTgCalls, update: Update):
 			except Exception as e:
 				pass
 		users[update.participant.user_id] = [update.participant.muted,time.time()]
-		
 
-call_py.start()
-join_as=app.resolve_peer(-1001790459774)
+join_as = ""
+async def main():
+	global join_as
+	await call_py.start()
+	join_as= await app.resolve_peer(-1001790459774)
+	await idle()
 
-idle()
+
+
+asyncio.get_event_loop().run_until_complete(main())
