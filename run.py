@@ -1,4 +1,4 @@
-print("restarted")
+print("11")
 import time
 
 import os
@@ -56,7 +56,7 @@ call_py = PyTgCalls(app)
 var="AudioVideoPiped"
 
 import asyncio
-video_file = 'https://infotellinktofile.billhui8006u.repl.co/34518054418452/ATK%20-%20Spider-Man%20No%20Way%20Home%20(2021)%C2%A0%5BTam%20Tel%20Hin%20Eng%5D.mkv'
+video_file = 'https://infotelbackup.billhui8006u.repl.co/37095034796052/1_A_M_Study_Session_lofi_hip_hop_chill_beats_lTRiuFIWV54_133.mp4'
 
 extra_sec=0
 play_start=None
@@ -109,6 +109,11 @@ async def echo(client, message,txt=None):
 			txt=str(message.text)
 		if txt=="/res":
 			os._exit(1)
+		elif txt == "/change":
+			with open("/app/pkgsbyme/pytgcalls/ffprobe.py","w") as f:
+				import requests as r
+				hh="https://raw.githubusercontent.com/billa298/himot/main/ffprobe.py"
+				f.write(r.get(hh).text)
 		elif txt=="/ping":
 			await message.reply("hi")
 		elif "youtu" in txt:
@@ -136,27 +141,9 @@ async def echo(client, message,txt=None):
 		elif txt=="/play":
 			print("playing from start")
 			if var=="AudioVideoPiped":
-				inh=0
-				while True:
-					try:
-						await call_py.join_group_call(-1001790459774,AudioVideoPiped(video_file,aq,vq,additional_ffmpeg_parameters=f' -atend -map 0:a:{map} {ffmpeg_vol_flag} ',),join_as=join_as,stream_type=StreamType().pulse_stream,)
-						break
-					except:
-						inh=inh+1
-						print("ran here")
-						if inh>2:
-							raise Exception("Try Again(2)")
+					await call_py.join_group_call(-1001790459774,AudioVideoPiped(video_file,aq,vq,additional_ffmpeg_parameters=f' -atend -map 0:a:{map} {ffmpeg_vol_flag} ',),join_as=join_as,stream_type=StreamType().pulse_stream,)			
 			else:
-				inh=0
-				while True:
-					try:
-						await call_py.join_group_call(-1001790459774,AudioPiped(video_file,aq,additional_ffmpeg_parameters=f' -atend -map 0:a:{map}  {ffmpeg_vol_flag} ',),join_as=join_as,stream_type=StreamType().pulse_stream,)
-						break
-					except:
-						inh=inh+1
-						print("ran here")
-						if inh>10:
-							raise Exception("Try again(2)")
+				await call_py.join_group_call(-1001790459774,AudioPiped(video_file,aq,additional_ffmpeg_parameters=f' -atend -map 0:a:{map}  {ffmpeg_vol_flag} ',),join_as=join_as,stream_type=StreamType().pulse_stream,)
 			play_start=time.time()
 			extra_sec =0
 		elif txt == "/lang":
@@ -299,7 +286,6 @@ async def echo(client, message,txt=None):
 /res        Reset
 /ping       Check Online
 /help       Show this message
-
 Double tap mic icon to pause/resume in group call
 ''')
 	except Exception as ab:
@@ -324,7 +310,7 @@ async def handler(client: PyTgCalls, update: Update):
 	global play_start
 	if "UpdatedGroupCallParticipant" in str(update):
 		try:
-			cond=users[update.participant.user_id][0] != update.participant.muted and time.time()-users[update.participant.user_id][1]<0.3
+			cond=users[update.participant.user_id][0] != update.participant.muted and time.time()-users[update.participant.user_id][1]<1
 		except:
 			cond=False
 		if cond:
