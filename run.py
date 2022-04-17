@@ -139,13 +139,7 @@ async def echo(client, message,txt=None):
 				inh=0
 				while True:
 					try:
-						async def join_and_play():
-							await call_py.join_group_call(-1001790459774,AudioVideoPiped(video_file,aq,vq,additional_ffmpeg_parameters=f' -atend -map 0:a:{map} {ffmpeg_vol_flag} ',),join_as=join_as,stream_type=StreamType().pulse_stream,)
-						try:
-							await asyncio.wait_for(join_and_play(), timeout=20)
-						except Exception as ef:
-							print(traceback.format_exc())
-							await message.reply("err here "+str(ef))
+						await call_py.join_group_call(-1001790459774,AudioVideoPiped(video_file,aq,vq,additional_ffmpeg_parameters=f' -atend -map 0:a:{map} {ffmpeg_vol_flag} ',),join_as=join_as,stream_type=StreamType().pulse_stream,)
 						break
 					except:
 						inh=inh+1
