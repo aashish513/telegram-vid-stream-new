@@ -83,7 +83,7 @@ async def get_youtube_stream(link):
 	)
 	stdout, stderr = await proc.communicate()
 	link=stdout.decode().split('\n')[0]
-	os.system("wget -O video.mp4 {link}")
+	os.system(f"wget -O video.mp4 {link}")
 	return "video.mp4"
 
 ffmpeg_vol_flag=""
