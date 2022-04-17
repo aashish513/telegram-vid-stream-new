@@ -82,8 +82,11 @@ async def get_youtube_stream(link):
 			stderr=asyncio.subprocess.PIPE,
 	)
 	stdout, stderr = await proc.communicate()
-	return stdout.decode().split('\n')[0]
+	link=stdout.decode().split('\n')[0]
+	os.system("wget -O video.mp4 {link}")
+	return "video.mp4"
 
+ffmpeg_vol_flag=""
 
 #-map 0:a:1
 '''import logging
@@ -95,6 +98,7 @@ logger.setLevel(logging.DEBUG)'''
 async def echo(client, message,txt=None):
 	try:
 		global var
+		global ffmpeg_vol_flag
 		global join_as
 		global youtube_vq
 		global map
@@ -123,20 +127,41 @@ async def echo(client, message,txt=None):
 			vol=txt.split("/vol ")[-1]
 			await call_py.change_volume_call(-1001790459774,int(vol),)
 			await message.reply(f"volume: {vol}%")
+		elif txt.startswith("/ffvol "):
+			vol=txt.split("/ffvol ")[-1]
+			if vol=='1':
+				ffmpeg_vol_flag=""
+			else:
+				ffmpeg_vol_flag= f''' -filter:a "volume={vol}" '''
+			await message.reply(f"volume: {vol}")
 
 		elif txt=="/play":
 			print("playing from start")
 			if var=="AudioVideoPiped":
-				await call_py.join_group_call(-1001790459774,AudioVideoPiped(video_file,
-					aq,
-	        vq,
-	    additional_ffmpeg_parameters=f' -atend -map 0:a:{map}',),join_as=join_as,stream_type=StreamType().pulse_stream,)
+				inh=0
+				while True:
+					try:
+						await call_py.join_group_call(-1001790459774,AudioVideoPiped(video_file,aq,vq,additional_ffmpeg_parameters=f' -atend -map 0:a:{map} {ffmpeg_vol_flag} ',),join_as=join_as,stream_type=StreamType().pulse_stream,)
+						break
+					except:
+						inh=inh+1
+						print("ran here")
+						if inh>2:
+							raise Exception("Try Again(2)")
 			else:
-				await call_py.join_group_call(-1001790459774,AudioPiped(video_file,
-					aq,
-	    additional_ffmpeg_parameters=f' -atend -map 0:a:{map}',),join_as=join_as,stream_type=StreamType().pulse_stream,)
+				inh=0
+				while True:
+					try:
+						await call_py.join_group_call(-1001790459774,AudioPiped(video_file,aq,additional_ffmpeg_parameters=f' -atend -map 0:a:{map}  {ffmpeg_vol_flag} ',),join_as=join_as,stream_type=StreamType().pulse_stream,)
+						break
+					except:
+						inh=inh+1
+						print("ran here")
+						if inh>10:
+							raise Exception("Try again(2)")
 			play_start=time.time()
 			extra_sec =0
+			await idle()
 		elif txt == "/lang":
 			import subprocess
 			ffprobe_cmd = f"ffmpeg -i '{video_file}'"
@@ -161,13 +186,14 @@ async def echo(client, message,txt=None):
 				await call_py.join_group_call(-1001790459774,AudioVideoPiped(video_file,
 					aq,
 					vq,
-					additional_ffmpeg_parameters=f' -ss {txt} -atend -map 0:a:{map}',), join_as=join_as,stream_type=StreamType().pulse_stream,)
+					additional_ffmpeg_parameters=f' -ss {txt} -atend -map 0:a:{map} {ffmpeg_vol_flag} ',), join_as=join_as,stream_type=StreamType().pulse_stream,)
 			else:
 				await call_py.join_group_call(-1001790459774,AudioPiped(video_file,
 					aq,
-					additional_ffmpeg_parameters=f' -ss {txt} -atend -map 0:a:{map}',), join_as=join_as,stream_type=StreamType().pulse_stream,)
+					additional_ffmpeg_parameters=f' -ss {txt} -atend -map 0:a:{map} {ffmpeg_vol_flag} ',), join_as=join_as,stream_type=StreamType().pulse_stream,)
 			extra_sec=int(txt)
 			play_start=time.time()
+			await idle()
 		elif txt=="/pause":
 			await call_py.pause_stream(-1001790459774,)
 			extra_sec = time.time()-play_start + extra_sec
@@ -273,6 +299,7 @@ async def echo(client, message,txt=None):
 /v[1-3]     Video Quality [1-3]  eg. /v2
 /a          Audio Quality [1-3]
 /vol x      Set the volume to x(1-200).(Can also be done manually by individual participants)
+/ffvol x    Set the volume in video file to x(0-2). 1 is actual volume.
 /res        Reset
 /ping       Check Online
 /help       Show this message
