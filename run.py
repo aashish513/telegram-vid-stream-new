@@ -94,13 +94,30 @@ logger.setLevel(logging.DEBUG)'''
 
 @app.on_message()
 async def echo(client, message,txt=None):
+	global video_file
+	try:
+		if message.media!= None:
+		    reply_msg=await message.reply("Downloading File")
+		    import random
+		    os.system("rm /tmp/output")
+		    async def progress(current, total):
+		        if random.random()>0.92:
+		            print("editing down progress")
+		            try:
+		                await reply_msg.edit_text(f"Downloading: {current * 100 / total:.1f}%")
+		            except:
+		                pass
+		    await message.download(file_name="/tmp/output", progress=progress)
+		    video_file="/tmp/output"
+		    await reply_msg.edit_text("Done ")
+	except Exception as e:
+		print("err in donwload: "+str(e))
 	try:
 		global var
 		global ffmpeg_vol_flag
 		global join_as
 		global youtube_vq
 		global map
-		global video_file
 		global extra_sec
 		global aq
 		global vq
