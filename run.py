@@ -101,7 +101,7 @@ async def echo(client, message,txt=None):
 		    import random
 		    os.system("rm /tmp/output")
 		    async def progress(current, total):
-		        if random.random()>0.92:
+		        if random.random()>0.95:
 		            print("editing down progress")
 		            try:
 		                await reply_msg.edit_text(f"Downloading: {current * 100 / total:.1f}%")
